@@ -11,6 +11,7 @@ const BoardContext = createContext({
   moveCardRight: (_i: number, _colId: number) => {},
   deleteColumn: (_i: number) => {},
   deleteCard: (_i: number, _colId: number) => {},
+  createCard: (_text: string, _colId: number) => {},
 });
 
 export const useBoardContext = () => useContext(BoardContext);
@@ -45,27 +46,18 @@ export const Board = () => {
     [boardColumns]
   );
 
-  const moveCardLeft = useCallback(
-    (cardId: number, columnId: number) => {
+  const moveCard = (movingDirection: 'left' | 'right') => {
+    return (cardId: number, columnId: number) => {
       const newBoardColumns = [...boardColumns];
       const movingCard = newBoardColumns[columnId].cards.splice(cardId, 1);
-      newBoardColumns[columnId - 1].cards.push(movingCard[0]);
+      newBoardColumns[movingDirection === 'left' ? columnId - 1 : columnId + 1].cards.push(movingCard[0]);
 
       setBoardColumns(newBoardColumns);
-    },
-    [boardColumns]
-  );
+    };
+  };
 
-  const moveCardRight = useCallback(
-    (cardId: number, columnId: number) => {
-      const newBoardColumns = [...boardColumns];
-      const movingCard = newBoardColumns[columnId].cards.splice(cardId, 1);
-      newBoardColumns[columnId + 1].cards.push(movingCard[0]);
-
-      setBoardColumns(newBoardColumns);
-    },
-    [boardColumns]
-  );
+  const moveCardLeft = moveCard('left');
+  const moveCardRight = moveCard('right');
 
   const deleteColumn = (columnId: number) => {
     const newBoardColumns = [...boardColumns];
@@ -81,6 +73,16 @@ export const Board = () => {
     setBoardColumns(newBoardColumns);
   };
 
+  const createCard = (cardText: string, columnId: number) => {
+    const newCard = {
+      title: cardText
+    };
+
+    const newBoardColumns = [...boardColumns];
+    newBoardColumns[columnId].cards.push(newCard);
+    setBoardColumns(newBoardColumns);
+  };
+
   const boardContextValue = {
     moveColumnLeft,
     moveColumnRight,
@@ -88,6 +90,7 @@ export const Board = () => {
     moveCardRight,
     deleteColumn,
     deleteCard,
+    createCard,
   };
 
   const renderColumn = (column: IColumn, columnInd: number, colsAmount: number) => {

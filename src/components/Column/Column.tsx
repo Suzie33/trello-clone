@@ -1,10 +1,12 @@
 import { Paper } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { useState } from 'react';
 import { useStyles } from './style';
 import { IColumn } from '../../types';
 import { BoardCard } from '../Card';
 import { useBoardContext } from '../Board';
 import { MoveButtons } from '../MoveButtons';
+import { CardForm } from '../CardForm';
 
 interface ColumnProps {
   columnData: IColumn;
@@ -21,6 +23,11 @@ export const Column = ({
 }: ColumnProps) => {
   const styles = useStyles();
   const { moveColumnLeft, moveColumnRight, deleteColumn } = useBoardContext();
+  const [isAddingCardMode, setIsAddingCardMode] = useState(false);
+
+  const toggleAddingCardMode = () => {
+    setIsAddingCardMode(isAddingCardMode => !isAddingCardMode);
+  };
 
   return (
     <Paper className={styles.column} classes={{ root: styles.column }}>
@@ -37,6 +44,10 @@ export const Column = ({
           <DeleteOutlineIcon className={styles.deleteBtn} onClick={() => deleteColumn(columnInd)} />
         </div>
       </div>
+
+      <button onClick={toggleAddingCardMode}>{isAddingCardMode ? '-' : '+'}</button>
+
+      {isAddingCardMode && <CardForm columnInd={columnInd} />}
 
       {columnData.cards.map((card, ind) => (
         <div key={ind} className={styles.card}>
